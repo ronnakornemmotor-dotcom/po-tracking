@@ -1,0 +1,13 @@
+# ข้อมูลจริงของบริษัท — ห้ามขึ้น repo public
+*.csv
+*.xlsx
+*.xls
+README_ติดตั้ง.md
+
+# ไฟล์ระบบ
+.DS_Store
+Thumbs.db
+desktop.ini
+~$*
+.claude/
+node_modules/

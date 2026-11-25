@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0E7A5F">
+<title>ระบบติดตามการสั่งซื้อ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<link rel="stylesheet" href="assets/css/app.css?v=1">
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+  <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M21 12a9 9 0 0 1-15.5 6.2L3 16"/><path d="M3 12a9 9 0 0 1 15.5-6.2L21 8"/><path d="M21 3v5h-5M3 21v-5h5"/></symbol>
+  <symbol id="i-download" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5M12 15V3"/></symbol>
+  <symbol id="i-list" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></symbol>
+  <symbol id="i-chart" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 16v-5M12 16V8M17 16v-9"/></symbol>
+  <symbol id="i-filter" viewBox="0 0 24 24"><path d="M22 3H2l8 9.5V19l4 2v-8.5L22 3z"/></symbol>
+  <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="i-checkc" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></symbol>
+  <symbol id="i-edit" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></symbol>
+  <symbol id="i-back" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></symbol>
+  <symbol id="i-upload" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 8 5-5 5 5M12 3v13"/></symbol>
+  <symbol id="i-file" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/></symbol>
+</svg>
+
+<header class="appbar" id="appbar">
+  <div class="appbar-row">
+    <img class="logo" id="logo" alt="โลโก้" width="44" height="38" src="assets/img/logo.jpg">
+    <h1>ติดตามการสั่งซื้อ<small id="subtitle"><span class="sub-full">กำลังโหลด…</span><span class="sub-min">กำลังโหลด…</span></small></h1>
+    <div class="tabs" role="tablist" aria-label="มุมมอง">
+      <button role="tab" data-view="list" aria-selected="true">รายการ</button>
+      <button role="tab" data-view="key" aria-selected="false">คีย์ PR</button>
+      <button role="tab" data-view="summary" aria-selected="false">สรุป</button>
+    </div>
+    <button class="icon-btn" id="btnImport" data-open-import aria-label="นำเข้าข้อมูลจากไฟล์" title="นำเข้าข้อมูลจากไฟล์"><svg class="i"><use href="#i-upload"/></svg></button>
+    <button class="icon-btn" id="btnExport" aria-label="ส่งออก CSV" title="ส่งออก CSV"><svg class="i"><use href="#i-download"/></svg></button>
+    <button class="icon-btn" id="btnRefresh" aria-label="รีเฟรชข้อมูล" title="รีเฟรช"><svg class="i"><use href="#i-refresh"/></svg></button>
+  </div>
+  <div class="search" id="searchBox">
+    <svg class="i"><use href="#i-search"/></svg>
+    <label for="q" class="sr-only">ค้นหา</label>
+    <input id="q" type="search" placeholder="ค้นหารหัส, ชื่ออะไหล่, PR, PO" autocomplete="off" enterkeyhint="search">
+    <button class="clear" id="qClear" aria-label="ล้างคำค้น"><svg class="i"><use href="#i-x"/></svg></button>
+  </div>
+</header>
+
+<div class="chips-bar" id="chipsBar">
+  <div class="chips" id="statusChips" role="group" aria-label="กรองตาม Status">
+    <button class="chip" data-status="" aria-pressed="true">ทั้งหมด <span class="cnt num" data-c=""></span></button>
+    <button class="chip" data-status="NON MOVE" aria-pressed="false"><span class="dot" style="background:#DC2626"></span>NON MOVE <span class="cnt num" data-c="NON MOVE"></span></button>
+    <button class="chip" data-status="SLOW MOVE" aria-pressed="false"><span class="dot" style="background:#D97706"></span>SLOW MOVE <span class="cnt num" data-c="SLOW MOVE"></span></button>
+    <button class="chip" data-status="FAST MOVE" aria-pressed="false"><span class="dot" style="background:#0FA36B"></span>FAST MOVE <span class="cnt num" data-c="FAST MOVE"></span></button>
+    <button class="chip action" id="btnSelect" aria-pressed="false"><svg class="i" style="width:16px;height:16px"><use href="#i-checkc"/></svg>เลือกแก้ไข</button>
+    <button class="chip action" data-open-filter><svg class="i" style="width:16px;height:16px"><use href="#i-filter"/></svg>ตัวกรอง <span class="badge-count" data-fcount hidden>0</span></button>
+  </div>
+</div>
+
+<main>
+  <section id="viewList" aria-label="รายการอะไหล่">
+    <div class="stats" id="stats"></div>
+    <div class="result-bar">
+      <span class="count" id="resultCount" aria-live="polite"></span>
+      <div class="bar-tools">
+        <label class="sr-only" for="sort">เรียงตาม</label>
+        <select id="sort" class="select-sm">
+          <option value="">เรียง: ค่าเริ่มต้น</option>
+          <option value="remain">ค้างเข้ามากสุด</option>
+          <option value="date">กำหนดเข้าใกล้สุด</option>
+          <option value="code">รหัสอะไหล่</option>
+          <option value="name">ชื่ออะไหล่</option>
+          <option value="model">Model</option>
+          <option value="upd">อัปเดตล่าสุด</option>
+        </select>
+      </div>
+    </div>
+    <div class="list" id="list"></div>
+    <div class="table-wrap" id="tableWrap">
+      <table>
+        <thead><tr>
+          <th class="pick-cell"><span class="sr-only">เลือก</span></th>
+          <th>Model</th><th>รหัสอะไหล่</th><th>ชื่ออะไหล่</th><th>Status</th><th>เลข PR / PO</th>
+          <th class="r">สั่ง</th><th class="r">เข้าแล้ว</th><th class="r">ค้างเข้า</th><th>กำหนดเข้า</th><th>อัปเดตล่าสุด</th><th><span class="sr-only">แก้ไข</span></th>
+        </tr></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+    <div id="sentinel"></div>
+  </section>
+
+  <section id="viewSummary" hidden aria-label="สรุปภาพรวม">
+    <div class="charts">
+      <div class="chart-card"><h2>สัดส่วนตาม Status</h2><div class="chart-box"><canvas id="chStatus" aria-label="กราฟสัดส่วน Status" role="img"></canvas></div></div>
+      <div class="chart-card"><h2>สถานะการสั่งซื้อ</h2><div class="chart-box"><canvas id="chFlow" aria-label="กราฟสถานะการสั่งซื้อ" role="img"></canvas></div></div>
+      <div class="chart-card wide"><h2>จำนวนอะไหล่ตามเดือนที่ออก PR</h2><div class="chart-box mid"><canvas id="chMonth" aria-label="กราฟตามเดือนที่ออก PR" role="img"></canvas></div></div>
+      <div class="chart-card wide"><h2>จำนวนชิ้นค้างเข้าตาม Model (Top 15)</h2><div class="chart-box mid"><canvas id="chModel" aria-label="กราฟชิ้นค้างเข้าตาม Model" role="img"></canvas></div></div>
+      <div class="chart-card wide"><h2>จำนวนชิ้นสั่ง / เข้าแล้ว / ค้างเข้า แยกตาม Status</h2><div class="chart-box mid"><canvas id="chQty" aria-label="กราฟจำนวนชิ้นแยกตาม Status" role="img"></canvas></div></div>
+    </div>
+  </section>
+
+  <!-- ===== คีย์ใบ PR ===== -->
+  <section id="viewKey" hidden aria-label="คีย์ใบ PR">
+    <div class="khead">
+      <h2>คีย์ใบ PR</h2>
+      <button class="icon-btn" data-view="list" aria-label="กลับไปรายการ"><svg class="i"><use href="#i-back"/></svg></button>
+    </div>
+
+    <div class="kcols">
+      <div>
+        <div class="kcard">
+          <h2>ข้อมูลใบ PR</h2>
+          <div class="field">
+            <label for="kPr">เลข PR <span style="color:var(--danger)">*</span></label>
+            <div class="kpr-wrap">
+              <input id="kPr" autocomplete="off" autocapitalize="characters" placeholder="เช่น PR26100001">
+              <button class="kpr-sug" id="kPrSuggest" type="button" title="เลข PR ถัดไปของเดือนนี้">PR…</button>
+            </div>
+            <div class="help">รูปแบบ PR + ปี 2 หลัก + เดือน 2 หลัก + ลำดับ 4 หลัก</div>
+          </div>
+          <div class="field"><label for="kPo">เลข PO</label><input id="kPo" autocomplete="off" autocapitalize="characters" placeholder="เว้นว่างได้"></div>
+          <div class="row2">
+            <div class="field"><label for="kDate">กำหนดเข้า</label><input id="kDate" type="date"><div class="help">เว้นว่างได้</div></div>
+            <div class="field"><label for="kQtyDef">จำนวนสั่งเริ่มต้น</label><input id="kQtyDef" type="number" inputmode="numeric" min="1" step="1" placeholder="0"><div class="help">ใส่แล้วทุกแถวที่ยังไม่แก้เองจะขยับตาม</div></div>
+          </div>
+          <div class="field"><label for="kNote">หมายเหตุ</label><textarea id="kNote" rows="2" placeholder="ใส่ค่าเดียวทั้งใบ — เว้นว่างได้"></textarea></div>
+        </div>
+
+        <div class="kcard">
+          <h2>เพิ่มอะไหล่ในใบ PR นี้</h2>
+          <div class="search ksearch" id="kSearchBox">
+            <svg class="i"><use href="#i-search"/></svg>
+            <label for="kQ" class="sr-only">ค้นหาอะไหล่</label>
+            <input id="kQ" type="search" placeholder="ค้นรหัสหรือชื่ออะไหล่" autocomplete="off">
+            <button class="clear" id="kQClear" aria-label="ล้างคำค้น"><svg class="i"><use href="#i-x"/></svg></button>
+          </div>
+          <div id="kResults" aria-live="polite"></div>
+        </div>
+        <datalist id="kModels"></datalist>
+      </div>
+
+      <div>
+        <div class="kcard">
+          <div class="ohead"><span>ในใบ PR นี้</span><span class="num" id="kCount">0 รายการ</span></div>
+          <div id="kItems"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="keybar">
+      <div class="keybar-sum" id="kSum">ยังไม่มีรายการ</div>
+      <div class="keybar-btns">
+        <button class="btn" id="kUndo" data-label="ย้อนกลับ" disabled>ย้อนกลับ</button>
+        <button class="btn" id="kClear">ล้างฟอร์ม</button>
+        <button class="btn primary" id="kSave" data-label="บันทึก"><span class="spinner"></span><span class="t">บันทึก</span></button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div class="selbar" id="selbar">
+  <span class="n num" id="selCount">เลือก 0</span>
+  <button class="btn" id="bulkAdd"><svg class="i" style="width:18px;height:18px"><use href="#i-plus"/></svg>เพิ่ม PR ให้ที่คัดลอกมา</button>
+  <button class="btn primary" id="bulkUpd">อัปเดต PR</button>
+  <button class="btn ghost" id="selAll" title="เลือกทั้งหมดตามตัวกรอง"><svg class="i" style="width:18px;height:18px"><use href="#i-checkc"/></svg></button>
+  <button class="btn ghost" id="selOff" aria-label="ออกจากโหมดเลือก"><svg class="i" style="width:18px;height:18px"><use href="#i-x"/></svg></button>
+</div>
+
+<nav class="bottomnav" role="tablist" aria-label="เมนูหลัก">
+  <button role="tab" data-view="list" aria-selected="true"><svg class="i"><use href="#i-list"/></svg>รายการ</button>
+  <button role="tab" data-view="key" aria-selected="false" class="key-tab"><svg class="i"><use href="#i-plus"/></svg>คีย์ PR</button>
+  <button role="tab" data-view="summary" aria-selected="false"><svg class="i"><use href="#i-chart"/></svg>สรุป</button>
+  <button data-open-filter aria-label="ตัวกรอง"><svg class="i"><use href="#i-filter"/></svg>ตัวกรอง<span class="badge-count" data-fcount hidden>0</span></button>
+</nav>
+
+<div class="backdrop" id="backdrop"></div>
+
+<!-- ===== ตัวกรอง ===== -->
+<div class="sheet" id="filterSheet" role="dialog" aria-modal="true" aria-labelledby="filterTitle">
+  <div class="sheet-handle"></div>
+  <div class="sheet-head">
+    <h2 id="filterTitle">ตัวกรอง</h2>
+    <button class="close" data-close aria-label="ปิด"><svg class="i"><use href="#i-x"/></svg></button>
+  </div>
+  <div class="sheet-body">
+    <div class="field">
+      <label for="fModel">Model</label>
+      <select id="fModel"><option value="">ทั้งหมด</option></select>
+    </div>
+    <div class="field">
+      <label for="fPr">เลข PR</label>
+      <select id="fPr"><option value="">ทั้งหมด</option></select>
+    </div>
+    <div class="field">
+      <label for="fPrMonth">เดือนที่ออก PR</label>
+      <select id="fPrMonth"><option value="">ทั้งหมด</option></select>
+      <div class="help">อ่านจากเลข PR เช่น PR<b>2608</b>0115 = เดือน 08</div>
+    </div>
+    <div class="field">
+      <span class="lbl" id="lblPrState">สถานะ PR</span>
+      <div class="seg" data-group="prState" role="group" aria-labelledby="lblPrState">
+        <button data-val="" aria-pressed="true">ทั้งหมด</button>
+        <button data-val="has" aria-pressed="false">มี PR</button>
+        <button data-val="none" aria-pressed="false">ยังไม่มี PR</button>
+      </div>
+    </div>
+    <div class="field">
+      <span class="lbl" id="lblDate">กำหนดเข้า</span>
+      <div class="seg" data-group="date" role="group" aria-labelledby="lblDate">
+        <button data-val="" aria-pressed="true">ทั้งหมด</button>
+        <button data-val="has" aria-pressed="false">มีกำหนด</button>
+        <button data-val="none" aria-pressed="false">ยังไม่มี</button>
+        <button data-val="late" aria-pressed="false">เลยกำหนด</button>
+      </div>
+    </div>
+    <div class="field">
+      <span class="lbl" id="lblRange">ช่วงกำหนดเข้า</span>
+      <div class="row2">
+        <div><label for="fFrom" class="sr-only">ตั้งแต่วันที่</label><input id="fFrom" type="date"></div>
+        <div><label for="fTo" class="sr-only">ถึงวันที่</label><input id="fTo" type="date"></div>
+      </div>
+      <div class="help">แสดงอะไหล่ที่มี PR ใดกำหนดเข้าอยู่ในช่วงนี้</div>
+    </div>
+    <div class="field">
+      <span class="lbl" id="lblRemain">ค้างเข้า</span>
+      <div class="seg" data-group="remain" role="group" aria-labelledby="lblRemain">
+        <button data-val="" aria-pressed="true">ทั้งหมด</button>
+        <button data-val="pending" aria-pressed="false">ยังค้างเข้า</button>
+        <button data-val="done" aria-pressed="false">เข้าครบแล้ว</button>
+      </div>
+    </div>
+  </div>
+  <div class="sheet-foot">
+    <button class="btn" id="fReset">ล้างทั้งหมด</button>
+    <button class="btn primary" data-close id="fApply">ดูผลลัพธ์</button>
+  </div>
+</div>
+
+<!-- ===== รายละเอียดอะไหล่ ===== -->
+<div class="sheet" id="partSheet" role="dialog" aria-modal="true" aria-labelledby="pTitle">
+  <div class="sheet-handle"></div>
+  <div class="sheet-head">
+    <h2 id="pTitle"></h2>
+    <button class="close" data-close aria-label="ปิด"><svg class="i"><use href="#i-x"/></svg></button>
+  </div>
+  <div class="sheet-body">
+    <div class="info-grid" id="pInfo"></div>
+    <div class="ohead"><span>รายการสั่งซื้อ (PR)</span><span class="num" id="pSum"></span></div>
+    <div id="pList"></div>
+  </div>
+  <div class="sheet-foot">
+    <button class="btn" data-close>ปิด</button>
+    <button class="btn primary" id="pAdd"><svg class="i" style="width:18px;height:18px"><use href="#i-plus"/></svg>เพิ่ม PR</button>
+  </div>
+</div>
+
+<!-- ===== แก้ไข PR ===== -->
+<div class="sheet" id="orderSheet" role="dialog" aria-modal="true" aria-labelledby="oTitle">
+  <div class="sheet-handle"></div>
+  <div class="sheet-head">
+    <h2 id="oTitle">เพิ่ม PR</h2>
+    <button class="close" data-close aria-label="ปิด"><svg class="i"><use href="#i-x"/></svg></button>
+  </div>
+  <div class="sheet-body">
+    <div class="field"><label for="oPr">เลข PR</label><input id="oPr" autocomplete="off" autocapitalize="characters" placeholder="เช่น PR26090027"><div class="help">เลข PR ของเดือน ปี 68 เช่น PR<b>6812</b>0034 เดือนธันวาคม</div></div>
+    <div class="field"><label for="oPo">เลข PO</label><input id="oPo" autocomplete="off" autocapitalize="characters" placeholder="เลขที่ PO"></div>
+    <div class="row2">
+      <div class="field" id="fldQty"><label for="oQty">จำนวนสั่ง</label><input id="oQty" type="number" inputmode="numeric" min="0" step="1" placeholder="0"><div class="err">ต้องเป็นตัวเลข 0 ขึ้นไป</div></div>
+      <div class="field" id="fldRecv"><label for="oRecv">จำนวนเข้าแล้ว</label><input id="oRecv" type="number" inputmode="numeric" min="0" step="1" placeholder="0"><div class="err">มากกว่าจำนวนสั่งไม่ได้</div></div>
+    </div>
+    <div class="field"><label for="oDate">กำหนดเข้า</label><input id="oDate" type="date"><div class="help">บันทึกลงชีตเป็น วว/ดด/ปปปป (ค.ศ.) เช่น 19/08/2026</div></div>
+    <div class="field"><label for="oNote">หมายเหตุ</label><textarea id="oNote" rows="3" placeholder="เช่น ซัพพลายเออร์แจ้งเลื่อน 2 สัปดาห์"></textarea></div>
+    <div class="remain-box" aria-live="polite"><span>ค้างเข้า</span><span class="v num" id="oRemain">0</span></div>
+  </div>
+  <div class="sheet-foot">
+    <button class="btn danger" id="oDel" hidden><svg class="i" style="width:18px;height:18px"><use href="#i-trash"/></svg>ลบ</button>
+    <button class="btn" data-close id="oCancel">ยกเลิก</button>
+    <button class="btn primary" id="oSave"><span class="spinner"></span><span class="t">บันทึก</span></button>
+  </div>
+</div>
+
+<!-- ===== แก้ไขหลายรายการ ===== -->
+<div class="sheet wide" id="bulkSheet" role="dialog" aria-modal="true" aria-labelledby="bTitle">
+  <div class="sheet-handle"></div>
+  <div class="sheet-head">
+    <h2 id="bTitle">แก้ไขหลายรายการ</h2>
+    <button class="close" data-close aria-label="ปิด"><svg class="i"><use href="#i-x"/></svg></button>
+  </div>
+  <div class="sheet-body" style="flex:none;padding-bottom:0">
+    <div class="seg tabs-seg" id="bulkTabs" role="tablist" aria-label="วิธีแก้ไข">
+      <button role="tab" data-bulk="add" aria-selected="true">เพิ่ม PR ให้รายการที่เลือก</button>
+      <button role="tab" data-bulk="upd" aria-selected="false">อัปเดต PR ของรายการที่เลือก</button>
+    </div>
+  </div>
+
+  <div class="sheet-body" id="bulkAddPane" style="padding-top:0">
+    <div class="field"><label for="bPr">เลข PR</label><input id="bPr" autocomplete="off" autocapitalize="characters" placeholder="เช่น PR26100005"></div>
+    <div class="field"><label for="bPo">เลข PO</label><input id="bPo" autocomplete="off" autocapitalize="characters" placeholder="เลขที่ PO"></div>
+    <div class="field"><label for="bDate">กำหนดเข้า</label><input id="bDate" type="date"></div>
+    <label class="checkline"><input type="checkbox" id="bQtyOn"><span>ใส่จำนวนสั่งเดียวกันทุกรายการ</span></label>
+    <div class="field" id="fldBQty" hidden><label for="bQty">จำนวนสั่ง</label><input id="bQty" type="number" inputmode="numeric" min="0" step="1" placeholder="0"></div>
+    <div class="field"><label for="bNote">หมายเหตุ</label><textarea id="bNote" rows="2" placeholder="เช่น สั่งรวมงวดเดือนตุลาคม"></textarea></div>
+    <div class="preview" id="bAddPrev"></div>
+  </div>
+
+  <div class="sheet-body" id="bulkUpdPane" hidden style="padding-top:0">
+    <div class="field"><label for="bSelPr">เลข PR ที่จะอัปเดต</label><select id="bSelPr"></select><div class="help">เลือก PR ที่ต้องการ — ระบบจะแก้ทุกบรรทัดของ PR นั้นในรายการที่เลือก</div></div>
+    <div class="field"><label for="bUPo">เลข PO</label><input id="bUPo" autocomplete="off" autocapitalize="characters" placeholder="เว้นว่าง = ไม่เปลี่ยน"></div>
+    <div class="field"><label for="bUDate">กำหนดเข้า</label><input id="bUDate" type="date"><div class="help">เว้นว่าง = ไม่เปลี่ยน</div></div>
+    <div class="field"><label for="bUNote">หมายเหตุ</label><textarea id="bUNote" rows="2" placeholder="เว้นว่าง = ไม่เปลี่ยน"></textarea></div>
+    <span class="lbl" style="display:block;font-size:14px;font-weight:600;margin-bottom:6px">จำนวนเข้าแล้ว</span>
+    <div class="seg" data-group="recvMode" role="group" aria-label="จำนวนเข้าแล้ว" style="margin-bottom:var(--s3)">
+      <button data-val="" aria-pressed="true">ไม่เปลี่ยน</button>
+      <button data-val="full" aria-pressed="false">รับครบตามจำนวนสั่ง</button>
+      <button data-val="set" aria-pressed="false">ระบุตัวเลข</button>
+    </div>
+    <div class="field" id="fldBRecv" hidden><label for="bRecv">จำนวนเข้าแล้ว</label><input id="bRecv" type="number" inputmode="numeric" min="0" step="1" placeholder="0"></div>
+    <div class="preview" id="bUpdPrev"></div>
+  </div>
+
+  <div class="sheet-foot">
+    <button class="btn" data-close>ยกเลิก</button>
+    <button class="btn primary" id="bSave"><span class="spinner"></span><span class="t">บันทึก</span></button>
+  </div>
+</div>
+
+<!-- ===== นำเข้าข้อมูลจากไฟล์ ===== -->
+<div class="sheet wide" id="importSheet" role="dialog" aria-modal="true" aria-labelledby="imTitle">
+  <div class="sheet-handle"></div>
+  <div class="sheet-head">
+    <h2 id="imTitle">นำเข้าข้อมูลจากไฟล์</h2>
+    <button class="close" data-close aria-label="ปิด"><svg class="i"><use href="#i-x"/></svg></button>
+  </div>
+  <div class="sheet-body">
+    <div id="imPick">
+      <label class="dropzone" id="imDrop">
+        <svg class="i"><use href="#i-file"/></svg>
+        <b>เลือกไฟล์ CSV</b>
+        <span class="muted">หรือลากไฟล์มาวางตรงนี้</span>
+        <input type="file" id="imFile" accept=".csv,.tsv,text/csv,text/tab-separated-values" class="sr-only">
+      </label>
+      <div class="help" style="margin-top:var(--s3)">
+        ไฟล์ต้องมี <b>แถวหัวคอลัมน์</b> และต้องมีคอลัมน์ <b>รหัสอะไหล่</b><br>
+        อ่านตามชื่อหัวคอลัมน์ เรียงลำดับไม่สำคัญ · ไม่ต้องมีคอลัมน์ ID ระบบสร้างให้เอง
+      </div>
+      <details class="im-more">
+        <summary>รองรับไฟล์อะไร · ตั้งค่าจาก Excel อย่างไร</summary>
+        <div class="help">
+          รองรับ <b>ไฟล์ .csv</b> เท่านั้น (ยังไม่รองรับ .xlsx)<br>
+          จาก Excel: <b>File → Save As → CSV UTF-8 (คั่นด้วยลูกน้ำ)</b><br>
+          ระบบตรวจจับตัวคั่นให้เอง ทั้ง <code>,</code> <code>;</code> <code>tab</code> และ <code>|</code><br>
+          ถ้าตั้งหัวคอลัมน์เป็น <code>PR</code>, <code>PO</code>, <code>qty</code> ก็อ่านได้เหมือนกัน<br>
+          วันที่รองรับทั้ง <code>2026-11-15</code>, <code>15/11/2026</code> และ <code>15 พ.ย. 2569</code>
+        </div>
+      </details>
+      <button class="btn ghost" id="imTpl" style="width:100%"><svg class="i" style="width:18px;height:18px"><use href="#i-download"/></svg>ดาวน์โหลดไฟล์ตัวอย่าง</button>
+    </div>
+
+    <div id="imPreview" hidden></div>
+    <div id="imDone" hidden></div>
+  </div>
+  <div class="sheet-foot">
+    <button class="btn" data-close>ปิด</button>
+    <button class="btn primary" id="imGo" hidden><span class="spinner"></span><span class="t">นำเข้า</span></button>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="config.js?v=1"></script>
+<script src="assets/js/api.js?v=1"></script>
+<script src="assets/js/app.js?v=1"></script>
+</body>
+</html>
